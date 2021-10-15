@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 array = []
 
+# Функция принимает массивы точек и значение, для кторого будет считать промежуточное значение с помощью полиномома Лагранжа
 def lagr(x, y, n):
     z = 0
     for j in range(len(y)):
@@ -19,6 +20,7 @@ def lagr(x, y, n):
         z = z + y[j] * p1 / p2
     return z
 
+# Функция принимает массивы точек и значение, для кторого будет считать промежуточное значение с помощью кусочно-линейного интерполирования
 def partline(x, y, t):
     z = 0
     for i in range(len(x)-1):
@@ -26,6 +28,7 @@ def partline(x, y, t):
             z = y[i] + (y[i+1]-y[i])*(t-x[i])/(x[i+1]-x[i])
     return z
 
+# Функция принимает массивы точек и значение, для кторого будет считать промежуточное значение с помощью кусочно-параболического интерполирования
 def partparab(x, y, t): 
     z = 0
     for i in range(len(x)-1):
@@ -65,18 +68,10 @@ def num_of_graph(arr):
     else:
         return "Указано некорректное значение графиков"
 
-
-def draw(points):
-    for point in points:
-        print(point)
-        x = point[0]
-        y = point[1]
-        plt.scatter(x, y)
-    plt.title("Графики")
-    plt.show()
-
+# Функция спрашивает у пользователя, каким методом производить интерполирование, также сортирует массивы с точками
 def howdraw(res):
         num =  int(input(f"1 - полиномом Лагранжа, 2 - кусочно-линейным интерполированием, \n 3 - кусочно-параболическим интерполированием, 4 - сплайнами интерполирования,  0 - просто вывести точки.\n"))
+        # Производим интерполирование полиномом Лагранжа
         if num == 1:
             for graph in res:
                 x = graph[0]
@@ -90,6 +85,7 @@ def howdraw(res):
             plt.title("Полином Лагранджа")
             plt.show()
 
+        # Производим кусочно линейное интерполирование
         elif num == 2:
             for graph in res:
                 x = graph[0]
@@ -103,6 +99,7 @@ def howdraw(res):
             plt.title("Кусочно-линейное интерполирование")
             plt.show()
 
+        # Производим кусочно-параолическое интерполирование
         elif num == 3:
             for graph in res:
                 x = graph[0]
@@ -113,9 +110,10 @@ def howdraw(res):
                 xnew = np.linspace(np.min(x), np.max(x), 100)
                 ynew = [partparab(x, y, i) for i in xnew]
                 plt.plot(xnew, ynew)
-            plt.title("Кусочно-линейное интерполирование")
+            plt.title("Кусочно-параболическое интерполирование")
             plt.show()
 
+        # Параболирование с помощью сплайнов
         elif num == 4:
             for graph in res:
                 x = graph[0]
@@ -128,7 +126,8 @@ def howdraw(res):
                 plt.plot(xnew, ynew)
             plt.title("Сплайны")
             plt.show()
-                
+            
+        # Просто выводим точки
         else:
             for point in res:
                 x = point[0]
@@ -138,12 +137,15 @@ def howdraw(res):
             plt.show()
             
 
-
+# Читаем файл с координатами и добавляем координаты в массив
 with open('points.txt', 'r') as f:
     for line in f.read().split('\n'):
         new_line = line[1:-1].split(']&&[')
         a = [list(map(float, elem.split(','))) for elem in new_line]
         array.append(a)
 
+# Выбираем графики для вывода
 res = num_of_graph(array)
+
+# Выбираем способ интерполирования
 howdraw(res)
