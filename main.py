@@ -1,5 +1,22 @@
+import numpy as np
 import matplotlib.pyplot as plt
 array = []
+
+def langr(x, y, n):
+    z = 0
+    for j in range(len(y)):
+        p1 = 1
+        p2 = 1
+
+        for i in range(len(x)):
+            if i==j:
+                p1 = p1 * 1; p2 = p2 * 1
+            else:
+                p1 = p1 * (n - x[i])
+                p2 = p2 * (x[j] - x[i])
+        z = z + y[j] * p1 / p2
+    return z
+
 
 # Определяемся с количеством вывода графиков
 def num_of_graph(arr):
@@ -30,11 +47,36 @@ def num_of_graph(arr):
 
 def draw(points):
     for point in points:
+        print(point)
         x = point[0]
         y = point[1]
         plt.scatter(x, y)
     plt.title("Графики")
     plt.show()
+
+def howdraw(res):
+        num =  int(input(f"1 - полиномом Лагранжа, 0 - просто вывести точки.\n"))
+        if num == 1:
+            for graph in res:
+                x = graph[0]
+                y = graph[1]
+                x.sort()
+                y.sort()
+                plt.scatter(x, y)
+                xnew = np.linspace(np.min(x), np.max(x), 50)
+                ynew = [langr(x, y, i) for i in xnew]
+                plt.plot(xnew, ynew)
+            plt.title("Полином Лагранджа")
+            plt.show()
+        
+        else:
+            for point in res:
+                x = point[0]
+                y = point[1]
+                plt.scatter(x, y)
+            plt.title("Графики")
+            plt.show()
+            
 
 
 with open('points.txt', 'r') as f:
@@ -44,4 +86,4 @@ with open('points.txt', 'r') as f:
         array.append(a)
 
 res = num_of_graph(array)
-draw(res)
+howdraw(res)
