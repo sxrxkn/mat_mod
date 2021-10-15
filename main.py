@@ -1,8 +1,10 @@
 import numpy as np
+import scipy.interpolate as sp
 import matplotlib.pyplot as plt
+
 array = []
 
-def langr(x, y, n):
+def lagr(x, y, n):
     z = 0
     for j in range(len(y)):
         p1 = 1
@@ -17,6 +19,25 @@ def langr(x, y, n):
         z = z + y[j] * p1 / p2
     return z
 
+def partline(x, y, t):
+    z = 0
+    for i in range(len(x)-1):
+        if t >= x[i] and t <= x[i+1]:
+            z = y[i] + (y[i+1]-y[i])*(t-x[i])/(x[i+1]-x[i])
+    return z
+
+def partparab(x, y, t): 
+    z = 0
+    for i in range(len(x)-1):
+        if t >= x[i] and t <= x[i+1]:
+            # Решаем систему уравнений через матрицу
+            M = np.array(
+                [[x[i-1]**2, x[i-1], 1], [x[i]**2, x[i], 1], [x[i+1]**2, x[i+1], 1]])
+            v = np.array([y[i-1], y[i], y[i+1]])
+            solve = np.linalg.solve(M, v)  # [a, b, c]
+            z = solve[0]*t**2 + solve[1]*t + solve[2]
+        i += 1
+    return z
 
 # Определяемся с количеством вывода графиков
 def num_of_graph(arr):
@@ -55,7 +76,7 @@ def draw(points):
     plt.show()
 
 def howdraw(res):
-        num =  int(input(f"1 - полиномом Лагранжа, 0 - просто вывести точки.\n"))
+        num =  int(input(f"1 - полиномом Лагранжа, 2 - кусочно-линейным интерполированием, \n 3 - кусочно-параболическим интерполированием, 4 - сплайнами интерполирования,  0 - просто вывести точки.\n"))
         if num == 1:
             for graph in res:
                 x = graph[0]
@@ -63,12 +84,51 @@ def howdraw(res):
                 x.sort()
                 y.sort()
                 plt.scatter(x, y)
-                xnew = np.linspace(np.min(x), np.max(x), 50)
-                ynew = [langr(x, y, i) for i in xnew]
+                xnew = np.linspace(np.min(x), np.max(x), 100)
+                ynew = [lagr(x, y, i) for i in xnew]
                 plt.plot(xnew, ynew)
             plt.title("Полином Лагранджа")
             plt.show()
-        
+
+        elif num == 2:
+            for graph in res:
+                x = graph[0]
+                y = graph[1]
+                x.sort()
+                y.sort()
+                plt.scatter(x, y)
+                xnew = np.linspace(np.min(x), np.max(x), 100)
+                ynew = [partline(x, y, i) for i in xnew]
+                plt.plot(xnew, ynew)
+            plt.title("Кусочно-линейное интерполирование")
+            plt.show()
+
+        elif num == 3:
+            for graph in res:
+                x = graph[0]
+                y = graph[1]
+                x.sort()
+                y.sort()
+                plt.scatter(x, y)
+                xnew = np.linspace(np.min(x), np.max(x), 100)
+                ynew = [partparab(x, y, i) for i in xnew]
+                plt.plot(xnew, ynew)
+            plt.title("Кусочно-линейное интерполирование")
+            plt.show()
+
+        elif num == 4:
+            for graph in res:
+                x = graph[0]
+                y = graph[1]
+                x.sort()
+                y.sort()
+                plt.scatter(x, y)
+                xnew = np.linspace(np.min(x), np.max(x), 100)
+                ynew = sp.interpolate.interp1d(x, y, kind='cubic')(xnew)
+                plt.plot(xnew, ynew)
+            plt.title("Сплайны")
+            plt.show()
+                
         else:
             for point in res:
                 x = point[0]
